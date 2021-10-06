@@ -1,5 +1,5 @@
 package:
-  name: scikit_build_example
+  name: dpu_trees
   version: 0.0.1
 
 source:
@@ -27,7 +27,7 @@ requirements:
 
 test:
   imports:
-    - scikit_build_example
+    - dpu_trees
   requires:
     - pytest
   source_files:
@@ -36,5 +36,5 @@ test:
     - pytest tests
 
 about:
-  summary: An example project built with pybind11 and scikit-build.
+  summary: A project to use DPUs for tree algorithms.
   license_file: LICENSE

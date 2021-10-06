@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15...3.19)
 
-project(scikit_build_example VERSION "0.0.1")
+project(dpu_trees VERSION "0.0.1")
 
 if(SKBUILD)
   # Scikit-Build does not add your site-packages to the search path automatically,

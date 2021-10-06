@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import scikit_build_example as m
+import dpu_trees as m
 
 
 def test_version():

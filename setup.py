@@ -18,14 +18,14 @@ from setuptools import find_packages
 
 
 setup(
-    name="scikit_build_example",
+    name="dpu_trees",
     version="0.0.1",
-    description="a minimal example package (with pybind11)",
-    author="Henry Schreiner",
+    description="a package for tree algorithms on DPU",
+    author="Sylvan Brocard",
     license="MIT",
     packages=find_packages(where = 'src'),
     package_dir={"": "src"},
-    cmake_install_dir="src/scikit_build_example",
+    cmake_install_dir="src/dpu_trees",
     include_package_data = True,
     extras_require={"test": ["pytest"]},
 )
