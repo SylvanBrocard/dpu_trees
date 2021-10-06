@@ -141,3 +141,6 @@ cython_debug/
 
 # VS code
 .vscode/
+
+# scikit-build
+_skbuild/
