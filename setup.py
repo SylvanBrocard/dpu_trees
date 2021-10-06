@@ -23,9 +23,9 @@ setup(
     description="a package for tree algorithms on DPU",
     author="Sylvan Brocard",
     license="MIT",
-    packages=find_packages(where = 'src'),
+    packages=find_packages(where="src"),
     package_dir={"": "src"},
     cmake_install_dir="src/dpu_trees",
-    include_package_data = True,
+    include_package_data=True,
     extras_require={"test": ["pytest"]},
 )
