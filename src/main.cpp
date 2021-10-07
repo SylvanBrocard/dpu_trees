@@ -7,6 +7,10 @@ int add(int i, int j) {
     return i + j;
 }
 
+int array_sum(){
+    return 0;
+}
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(_core, m) {

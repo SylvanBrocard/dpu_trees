@@ -13,7 +13,14 @@
 
 
     // Add the IDs of extensions you want installed when the container is created.
-    "extensions": [],
+    "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "twxs.cmake",
+        "ms-azuretools.vscode-docker",
+        "donjayamanne.githistory",
+        "ms-python.vscode-pylance",
+        "ms-python.python"
+    ],
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],

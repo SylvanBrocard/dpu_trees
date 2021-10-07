@@ -1,2 +1,4 @@
 # -*- coding: utf-8 -*-
-add(3, 5)
+from . import add2
+
+add2(3, 5)
