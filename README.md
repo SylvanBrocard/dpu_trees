@@ -29,13 +29,18 @@ Development
 - clone this repository
 - `cd dpu_trees`
 - `pre-commit install`
-- `python setup.py develop`
 
 OR
 
 - clone this repository
 - open folder in VS Code
 - start in Dev Container
+
+Testing
+-------
+
+- clone this repository
+- `nox`
 
 Test call
 ---------

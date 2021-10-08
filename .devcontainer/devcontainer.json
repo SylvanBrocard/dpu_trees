@@ -29,5 +29,5 @@
     // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "vscode",
 
-    "postCreateCommand": "pre-commit install && sudo python3 setup.py develop"
+    "postCreateCommand": "pre-commit install"
 }
