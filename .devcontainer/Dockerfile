@@ -14,4 +14,4 @@ RUN sudo apt update \
     && sudo apt install -y ./upmem_2021.2.0_amd64.deb \
     && sudo apt install -y pip cmake ninja-build \
     && sudo apt full-upgrade -y \
-    && pip install pre-commit scikit-build pybind11[global]
+    && pip install --upgrade nox pre-commit scikit-build pybind11[global]
