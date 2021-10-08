@@ -1,7 +1,6 @@
-scikit_build_example
+dpu_trees
 ==============
 
-[![Gitter][gitter-badge]][gitter-link]
 
 |      CI              | status |
 |----------------------|--------|
@@ -37,6 +36,18 @@ Installation
      - `pip install ./dpu_trees`
  - For Python 2.7:
      - Pybind11 + Scikit-Build does not support Python 2.7 on Windows.
+
+Development
+-----------
+
+- clone this repository
+- `pre-commit install`
+- `python setup.py develop`
+
+OR
+
+- open folder in VS Code
+- start in Dev Container
 
 CI Examples
 -----------
