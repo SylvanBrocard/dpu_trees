@@ -14,12 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [windows-latest, macos-latest, ubuntu-latest]
-        python-version: ["2.7", "3.5", "3.9", "3.10-dev"]
-
-        exclude:
-          # Not supported by scikit-build
-        - platform: windows-latest
-          python-version: "2.7"
+        python-version: ["3.5", "3.9", "3.10-dev"]
 
     runs-on: ${{ matrix.platform }}
 
