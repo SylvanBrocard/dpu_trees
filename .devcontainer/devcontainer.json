@@ -16,9 +16,7 @@
     "extensions": [
         "llvm-vs-code-extensions.vscode-clangd",
         "twxs.cmake",
-        "ms-azuretools.vscode-docker",
         "donjayamanne.githistory",
-        "ms-python.vscode-pylance",
         "ms-python.python"
     ],
 
@@ -31,5 +29,5 @@
     // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "vscode",
 
-    "postCreateCommand": "pre-commit install && python setup.py develop"
+    "postCreateCommand": "pre-commit install && sudo python3 setup.py develop"
 }

@@ -33,6 +33,7 @@ Development
 
 OR
 
+- clone this repository
 - open folder in VS Code
 - start in Dev Container
 
