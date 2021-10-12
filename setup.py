@@ -22,6 +22,15 @@ subprocess.run(
     ["dpu-upmem-dpurte-clang", "-o", "helloworld", "helloworld.c"],
     cwd="./src/dpu_trees/dpu_program",
 )
+subprocess.run(
+    [
+        "dpu-upmem-dpurte-clang",
+        "-o",
+        "trivial_checksum_example",
+        "trivial_checksum_example.c",
+    ],
+    cwd="./src/dpu_trees/dpu_program",
+)
 
 # compilation of the host library
 setup(

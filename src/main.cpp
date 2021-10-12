@@ -13,6 +13,7 @@ int array_sum(){
 
 extern "C" char* call_home(char*);
 extern "C" int dpu_test(char*);
+extern "C" int checksum(char*);
 
 namespace py = pybind11;
 
@@ -30,6 +31,7 @@ PYBIND11_MODULE(_core, m) {
            subtract
            call_home
            dpu_test
+           checksum
     )pbdoc";
 
     m.def("add", &add, R"pbdoc(
@@ -50,6 +52,10 @@ PYBIND11_MODULE(_core, m) {
 
     m.def("dpu_test", &dpu_test, R"pbdoc(
         Call hello world on dpu
+    )pbdoc");
+
+    m.def("checksum", &checksum, R"pbdoc(
+        Checksum test on dpus
     )pbdoc");
 
 #ifdef VERSION_INFO
