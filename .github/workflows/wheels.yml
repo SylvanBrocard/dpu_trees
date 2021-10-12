@@ -24,6 +24,12 @@ jobs:
       with:
         submodules: true
 
+    - name: Download SDK
+      run: wget http://sdk-releases.upmem.com/2021.2.0/ubuntu_20.04/upmem_2021.2.0_amd64.deb
+
+    - name: Install SDK
+      run: sudo apt install -y ./upmem_2021.2.0_amd64.deb
+
     - name: Build SDist
       run: pipx run build --sdist
 
@@ -52,12 +58,6 @@ jobs:
       env:
         # Python 2.7 on Windows with workaround not supported by scikit-build
         CIBW_SKIP: cp27-win*
-
-    - name: Download SDK
-      run: wget http://sdk-releases.upmem.com/2021.2.0/ubuntu_20.04/upmem_2021.2.0_amd64.deb
-
-    - name: Install SDK
-      run: sudo apt install -y ./upmem_2021.2.0_amd64.deb
 
     - name: Verify clean directory
       run: git diff --exit-code
