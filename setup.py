@@ -40,6 +40,7 @@ setup(
     author="Sylvan Brocard",
     author_email="sylvan.brocard@gmail.com",
     url="https://github.com/SylvanBrocard/dpu_trees",
+    download_url="https://github.com/SylvanBrocard/dpu_trees/archive/refs/tags/v0.0.1-alpha.tar.gz",
     license="MIT",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
