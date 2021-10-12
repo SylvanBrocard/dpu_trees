@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import subprocess
 
 try:
     from skbuild import setup
@@ -14,7 +15,15 @@ except ImportError:
 
 from setuptools import find_packages
 
+# compilation of the DPU binary
+# with open("./src/dpu_trees/mockup_dpu_binary", "w") as outfile:
+#     subprocess.run(["echo", "something something"], stdout=outfile)
+subprocess.run(
+    ["dpu-upmem-dpurte-clang", "-o", "../dpu_trees/helloworld", "helloworld.c"],
+    cwd="./src/dpu_program",
+)
 
+# compilation of the host library
 setup(
     name="dpu_trees",
     version="0.0.1",

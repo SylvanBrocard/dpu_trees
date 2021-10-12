@@ -11,6 +11,9 @@ int array_sum(){
     return 0;
 }
 
+extern "C" char* call_home(char*);
+extern "C" int dpu_test(char*);
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(_core, m) {
@@ -37,6 +40,14 @@ PYBIND11_MODULE(_core, m) {
         Subtract two numbers
 
         Some other explanation about the subtract function.
+    )pbdoc");
+
+    m.def("call_home", &call_home, R"pbdoc(
+        Get a number from the c file
+    )pbdoc");
+
+    m.def("dpu_test", &dpu_test, R"pbdoc(
+        Call hello world on dpu
     )pbdoc");
 
 #ifdef VERSION_INFO
