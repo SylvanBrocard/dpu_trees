@@ -18,8 +18,8 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
-        -----------------------
+        DPU trees plugin
+        ----------------
 
         .. currentmodule:: dpu_trees
 
@@ -28,6 +28,8 @@ PYBIND11_MODULE(_core, m) {
 
            add
            subtract
+           call_home
+           dpu_test
     )pbdoc";
 
     m.def("add", &add, R"pbdoc(
