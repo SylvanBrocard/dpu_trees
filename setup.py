@@ -19,8 +19,8 @@ from setuptools import find_packages
 # with open("./src/dpu_trees/mockup_dpu_binary", "w") as outfile:
 #     subprocess.run(["echo", "something something"], stdout=outfile)
 subprocess.run(
-    ["dpu-upmem-dpurte-clang", "-o", "../dpu_trees/helloworld", "helloworld.c"],
-    cwd="./src/dpu_program",
+    ["dpu-upmem-dpurte-clang", "-o", "helloworld", "helloworld.c"],
+    cwd="./src/dpu_trees/dpu_program",
 )
 
 # compilation of the host library

@@ -11,5 +11,5 @@ from . import dpu_test
 
 
 def test_dpu_bin():
-    file_to_read = os.path.dirname(__file__) + "/helloworld"
+    file_to_read = os.path.dirname(__file__) + "/dpu_program/helloworld"
     return dpu_test(file_to_read)

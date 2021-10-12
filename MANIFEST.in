@@ -1,1 +1,1 @@
-include src/dpu_trees/helloworld
+include src/dpu_trees/dpu_program/helloworld

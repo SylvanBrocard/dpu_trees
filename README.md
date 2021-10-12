@@ -45,6 +45,7 @@ Testing
 
 - clone this repository
 - install the [UPMEM SDK](https://sdk.upmem.com/)
+- install [nox](https://nox.thea.codes/)
 - `cd dpu_trees`
 - `nox`
 
@@ -55,7 +56,7 @@ OR
 - start in Dev Container
 - `nox`
 
-*Note:* `nox` and `pip` will fail if you used `setup.py develop`, delete the `_skbuild` cache folder to solve.
+*Note:* `nox` and `pip` will fail if you executed `setup.py install` or `setup.py develop`, delete the `_skbuild` cache folder to solve.
 
 Test call
 ---------
