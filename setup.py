@@ -38,6 +38,8 @@ setup(
     version="0.0.1",
     description="a package for tree algorithms on DPU",
     author="Sylvan Brocard",
+    author_email="sylvan.brocard@gmail.com",
+    url="https://github.com/SylvanBrocard/dpu_trees",
     license="MIT",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
