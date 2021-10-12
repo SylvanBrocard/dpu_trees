@@ -29,7 +29,7 @@ jobs:
       run: wget http://sdk-releases.upmem.com/2021.2.0/ubuntu_20.04/upmem_2021.2.0_amd64.deb
 
     - name: Install SDK
-      run: apt install -y ./upmem_2021.2.0_amd64.deb
+      run: sudo apt install -y ./upmem_2021.2.0_amd64.deb
 
     - name: Add requirements
       run: python -m pip install --upgrade wheel setuptools
