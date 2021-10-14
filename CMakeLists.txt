@@ -1,21 +1,24 @@
 cmake_minimum_required(VERSION 3.15...3.19)
 
-# set(CMAKE_C_COMPILER "gcc") set(CMAKE_CXX_COMPILER "g++")
-project(dpu_trees VERSION "0.0.1")
+project(dpu_trees)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# add_compile_options("`dpu-pkg-config --cflags --libs dpu`")
-# add_definitions("`dpu-pkg-config --cflags dpu`")
-# add_definitions("-I/usr/include/dpu")
+# =================== BUILDING THE DPU BINARY ======================
 
-set(DPU_ROOT ${CMAKE_BINARY_DIR})
+include(ExternalProject)
 
-# include(ExternalProject)
+ExternalProject_Add(
+  dpu_program
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/dpu_program
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>/dpu_program)
 
-# ExternalProject_Add(dpu_program PREFIX ${DPU_ROOT} SOURCE_DIR
-# ${DPU_ROOT}/src/dpu_program BUILD_IN_SOURCE 1 BUILD_COMMAND
-# dpu-upmem-dpurte-clang)
+ExternalProject_Get_Property(dpu_program INSTALL_DIR)
+set(DPU_PROGRAM_INSTALL_DIR ${INSTALL_DIR}/dpu_program)
+
+install(DIRECTORY ${DPU_PROGRAM_INSTALL_DIR} DESTINATION .)
+
+# =================== BUILDING THE HOST BINARY ======================
 
 if(SKBUILD)
   # Scikit-Build does not add your site-packages to the search path
@@ -37,8 +40,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(DPU REQUIRED dpu)
 
 pybind11_add_module(_core MODULE src/main.cpp src/trees.c)
-# target_include_directories(_core PRIVATE /usr/include/dpu)
-# target_link_libraries(_core PRIVATE dpu)
 target_link_libraries(_core PRIVATE ${DPU_LIBRARIES})
 target_include_directories(_core PRIVATE ${DPU_INCLUDE_DIRS})
 target_compile_options(_core PRIVATE ${DPU_CFLAGS_OTHER})

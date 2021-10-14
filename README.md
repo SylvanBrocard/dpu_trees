@@ -7,7 +7,7 @@ dpu_trees
 | pip builds           | [![Pip Actions Status][actions-pip-badge]][actions-pip-link] |
 | wheel                | [![Wheels Actions Status][actions-wheels-badge]][actions-wheels-link] |
 
-A project built with [pybind11](https://github.com/pybind/pybind11) and scikit-build.
+A project built with [pybind11](https://github.com/pybind/pybind11) and scikit-build, running DPU programs with the UPMEM SDK.
 
 [actions-badge]:           https://github.com/SylvanBrocard/dpu_trees/workflows/Tests/badge.svg
 [actions-conda-link]:      https://github.com/SylvanBrocard/dpu_trees/actions?query=workflow%3AConda
@@ -19,6 +19,10 @@ A project built with [pybind11](https://github.com/pybind/pybind11) and scikit-b
 
 Installation
 ------------
+
+-`pip install dpu-trees`
+
+OR
 
 - clone this repository
 - install the [UPMEM SDK](https://sdk.upmem.com/)
@@ -32,7 +36,7 @@ Development
 - `cd dpu_trees`
 - `pre-commit install`
 - `python3 setup.py develop`
-- `rm -r _skbuild`
+- `python setup.py clean`
 
 OR
 
@@ -56,7 +60,7 @@ OR
 - start in Dev Container
 - `nox`
 
-*Note:* `nox` and `pip` will fail if you executed `setup.py install` or `setup.py develop`, delete the `_skbuild` cache folder to solve.
+*Note:* `nox` and `pip` will fail if you executed `setup.py install` or `setup.py develop`, delete the cache by running `python setup.py clean` to solve.
 
 Test call
 ---------

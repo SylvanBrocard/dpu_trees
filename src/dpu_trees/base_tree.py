@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import os.path
+try:
+    from importlib.resources import files, as_file
+except ImportError:
+    # Try backported to PY<39 `importlib_resources`.
+    from importlib_resources import files, as_file
 
-# from . import call_home
 from . import dpu_test, checksum
-
-# def printbin():
-#     file_to_read = os.path.dirname(__file__) + "/mockup_dpu_binary"
-#     return call_home(file_to_read)
 
 
 def test_dpu_bin():
-    file_to_read = os.path.dirname(__file__) + "/dpu_program/helloworld"
-    return dpu_test(file_to_read)
+    ref = files("dpu_trees").joinpath("dpu_program/helloworld")
+    with as_file(ref) as path:
+        dpu_test(str(path))
 
 
 def test_checksum():
-    file_to_read = os.path.dirname(__file__) + "/dpu_program/trivial_checksum_example"
-    return f"{checksum(file_to_read):#0{10}x}"
+    ref = files("dpu_trees").joinpath("dpu_program/trivial_checksum_example")
+    with as_file(ref) as path:
+        return f"{checksum(str(path)):#0{10}x}"

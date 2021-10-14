@@ -144,3 +144,6 @@ cython_debug/
 
 # scikit-build
 _skbuild/
+
+# built dpu binaries
+src/dpu_trees/dpu_program/

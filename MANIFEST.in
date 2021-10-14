@@ -1,2 +1,7 @@
-include src/dpu_trees/dpu_program/helloworld
-include src/dpu_trees/dpu_program/trivial_checksum_example
+include pyproject.toml
+include README.md
+include LICENSE
+
+graft src
+
+prune src/dpu_trees/dpu_program
