@@ -1,6 +1,7 @@
 include pyproject.toml
 include README.md
 include LICENSE
+include CMakeLists.txt
 
 graft src
 

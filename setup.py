@@ -17,7 +17,7 @@ from setuptools import find_packages
 # compilation of the host library
 setup(
     name="dpu_trees",
-    version="0.0.2-alpha",
+    version="0.0.3-alpha",
     description="a package for tree algorithms on DPU",
     author="Sylvan Brocard",
     author_email="sylvan.brocard@gmail.com",
