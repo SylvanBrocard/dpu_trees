@@ -20,7 +20,7 @@ A project built with [pybind11](https://github.com/pybind/pybind11) and scikit-b
 Installation
 ------------
 
--`pip install dpu-trees`
+- `pip install dpu-trees`
 
 OR
 
