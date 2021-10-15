@@ -35,14 +35,16 @@ endif()
 # Now we can find pybind11
 find_package(pybind11 CONFIG REQUIRED)
 
-# find_package(dpu CONFIG REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(DPU REQUIRED dpu)
+if(DEFINED ENV{UPMEM_HOME})
+  list(APPEND CMAKE_PREFIX_PATH "${UPMEM_HOME}/share/pkgconfig")
+endif()
+set(PKG_CONFIG_EXECUTABLE "dpu-pkg-config")
+pkg_search_module(DPU REQUIRED IMPORTED_TARGET dpu)
 
 pybind11_add_module(_core MODULE src/main.cpp src/trees.c)
-target_link_libraries(_core PRIVATE ${DPU_LIBRARIES})
-target_include_directories(_core PRIVATE ${DPU_INCLUDE_DIRS})
-target_compile_options(_core PRIVATE ${DPU_CFLAGS_OTHER})
+target_link_libraries(_core PRIVATE PkgConfig::DPU)
+target_include_directories(_core PRIVATE PkgConfig::DPU)
 
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
