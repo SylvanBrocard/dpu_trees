@@ -37,10 +37,9 @@ find_package(pybind11 CONFIG REQUIRED)
 
 set(PKG_CONFIG_EXECUTABLE "dpu-pkg-config")
 find_package(PkgConfig REQUIRED)
-if(DEFINED ENV{UPMEM_HOME})
-  # list(APPEND CMAKE_PREFIX_PATH "${UPMEM_HOME}/share/pkgconfig")
-  set(ENV{PKG_CONFIG_PATH} "${UPMEM_HOME}/share/pkgconfig")
-endif()
+# if(DEFINED ENV{UPMEM_HOME}) list(APPEND CMAKE_PREFIX_PATH
+# "${UPMEM_HOME}/share/pkgconfig") # set(ENV{PKG_CONFIG_PATH}
+# "${UPMEM_HOME}/share/pkgconfig") endif()
 pkg_search_module(DPU REQUIRED IMPORTED_TARGET dpu)
 
 pybind11_add_module(_core MODULE src/main.cpp src/trees.c)

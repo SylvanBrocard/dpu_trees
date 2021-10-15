@@ -63,11 +63,6 @@ jobs:
     - name: Install SDK
       run: source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
 
-    - name: checking pkg-config installation
-      run: |
-        source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
-        echo $UPMEM_HOME
-
     - name: Build and install
       run: |
         source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
