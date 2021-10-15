@@ -64,10 +64,16 @@ jobs:
       run: source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
 
     - name: checking pkg-config installation
-      run: echo $UPMEM_HOME
+      run: |
+        source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
+        echo $UPMEM_HOME
 
     - name: Build and install
-      run: pip install --verbose .[test]
+      run: |
+        source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
+        pip install --verbose .[test]
 
     - name: Test
-      run: pytest
+      run: |
+        source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
+        pytest
