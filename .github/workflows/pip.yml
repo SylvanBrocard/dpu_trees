@@ -54,9 +54,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: install pkg-config
-      run: sudo apt install pkg-config
-
     - name: Download SDK
       run: wget http://sdk-releases.upmem.com/2021.2.0/ubuntu_20.04/upmem-2021.2.0-Linux-x86_64.tar.gz
 
