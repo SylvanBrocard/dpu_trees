@@ -57,8 +57,11 @@ jobs:
     - name: Download SDK
       run: wget http://sdk-releases.upmem.com/2021.2.0/ubuntu_20.04/upmem-2021.2.0-Linux-x86_64.tar.gz
 
+    - name: Untar SDK
+      run: tar -zxvf upmem-2021.2.0-Linux-x86_64.tar.gz
+
     - name: Install SDK
-      run: tar -zxvf upmem-2021.2.0-Linux-x86_64.tar.gz && source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
+      run: source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
 
     - name: checking pkg-config installation
       run: echo $UPMEM_HOME
