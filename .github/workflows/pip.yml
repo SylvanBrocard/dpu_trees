@@ -60,9 +60,6 @@ jobs:
     - name: Untar SDK
       run: tar -zxvf upmem-2021.2.0-Linux-x86_64.tar.gz
 
-    - name: Install SDK
-      run: source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
-
     - name: Build and install
       run: |
         source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
