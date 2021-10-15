@@ -61,7 +61,7 @@ jobs:
       run: tar -zxvf upmem-2021.2.0-Linux-x86_64.tar.gz && source upmem-2021.2.0-Linux-x86_64/upmem_env.sh
 
     - name: checking pkg-config installation
-      run: echo $UPMEM_HOME && which dpu-pkg-config
+      run: echo $UPMEM_HOME
 
     - name: Build and install
       run: pip install --verbose .[test]
