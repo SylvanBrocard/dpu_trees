@@ -36,6 +36,9 @@ endif()
 find_package(pybind11 CONFIG REQUIRED)
 
 find_package(PkgConfig REQUIRED)
+if(DEFINED ENV{UPMEM_HOME})
+  list(APPEND CMAKE_PREFIX_PATH "${UPMEM_HOME}/share/pkgconfig")
+endif()
 set(PKG_CONFIG_EXECUTABLE "dpu-pkg-config")
 pkg_search_module(DPU REQUIRED IMPORTED_TARGET dpu)
 
