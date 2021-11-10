@@ -6,7 +6,7 @@
 extern "C"
 {
 #include <dpu.h>
-#include "kmeans.h"
+#include "trees.h"
 }
 
 #define STRINGIFY(x) #x
@@ -33,6 +33,7 @@ private:
     Params p;
     float **features_float;
     int_feature **features_int;
+    int *targets;
 
 public:
     /**
@@ -62,11 +63,11 @@ public:
     {
         p.from_file = true;
         if (is_binary_file)
-            read_bin_input(&p, filename, &features_float);
+            read_bin_input_with_int_targets(&p, filename, &features_float, &targets);
         else
         {
-            read_txt_input(&p, filename, &features_float);
-            save_dat_file(&p, filename, features_float);
+            read_txt_input_with_int_target(&p, filename, &features_float, &targets);
+            save_dat_file_with_int_target(&p, filename, features_float, targets);
         }
         transfer_data(threshold_in, verbose);
     }
@@ -131,7 +132,7 @@ public:
         deallocateMemory();
     }
 
-    py::array_t<float> kmeans_cpp(
+    py::array_t<float> trees_cpp(
         int max_nclusters,
         int min_nclusters,
         int isRMSE,
@@ -147,7 +148,7 @@ public:
  *
  * @return py::array_t<float> The centroids coordinates found by the algorithm.
  */
-py::array_t<float> Container ::kmeans_cpp(
+py::array_t<float> Container ::trees_cpp(
     int max_nclusters,               /**< upper bound of the number of clusters */
     int min_nclusters,               /**< lower bound of the number of clusters */
     int isRMSE,                      /**< whether or not RMSE is computed */

@@ -142,8 +142,8 @@ int cluster(
 
     if (p->isOutput)
     {
-        printf("points per DPU : %d\n", p->npointperdpu);
-        printf("tasks per DPU: %d\n", p->npointperdpu / task_size_in_points);
+        printf("points per DPU : %lu\n", p->npointperdpu);
+        printf("tasks per DPU: %lu\n", p->npointperdpu / task_size_in_points);
         printf("task size in points : %d\n", task_size_in_points);
         printf("task size in bytes : %d\n", task_size_in_bytes);
     }
