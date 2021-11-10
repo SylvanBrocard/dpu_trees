@@ -13,24 +13,32 @@ except ImportError:
     raise
 
 from setuptools import find_packages
+from setuptools_scm import get_version
+
+version = get_version(local_scheme="no-local-version")
+version = "".join([c for c in version if c.isdigit() or c == "."])
 
 # compilation of the host library
 setup(
-    name="dpu_trees",
-    version="0.0.4-alpha",
-    description="a package for tree algorithms on DPU",
-    author="Sylvan Brocard",
-    author_email="sylvan.brocard@gmail.com",
-    url="https://github.com/SylvanBrocard/dpu_trees",
-    download_url="https://github.com/SylvanBrocard/dpu_trees/archive/refs/tags/v0.0.2-alpha.tar.gz",
-    license="MIT",
+    use_scm_version={
+        "root": ".",
+        "relative_to": __file__,
+    },
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     cmake_install_dir="src/dpu_trees",
     include_package_data=True,
+    install_requires=[
+        "numpy",
+        "scikit-learn",
+        "importlib_resources;python_version<'3.9'",
+    ],
     extras_require={
         "test": ["pytest"],
-        ':python_version < "3.9"': ["importlib_resources"],
     },
     zip_safe=False,
+    cmake_args=[
+        "-DNR_TASKLETS=16",  # number of parallel tasklets on each DPU
+        f"-DVERSION={version}",
+    ],
 )

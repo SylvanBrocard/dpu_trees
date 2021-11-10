@@ -1,13 +1,11 @@
 dpu_trees
-==============
+=========
 
 |      CI              | status |
 |----------------------|--------|
-| conda.recipe         | [![Conda Actions Status][actions-conda-badge]][actions-conda-link] |
 | pip builds           | [![Pip Actions Status][actions-pip-badge]][actions-pip-link] |
-| wheel                | [![Wheels Actions Status][actions-wheels-badge]][actions-wheels-link] |
 
-A project built with [pybind11](https://github.com/pybind/pybind11) and scikit-build, running DPU programs with the UPMEM SDK.
+A project built with [pybind11](https://github.com/pybind/pybind11) and [scikit-build](https://github.com/scikit-build/scikit-build), running the KMeans algorithm on in-memory processors with the UPMEM SDK.
 
 [actions-badge]:           https://github.com/SylvanBrocard/dpu_trees/workflows/Tests/badge.svg
 [actions-conda-link]:      https://github.com/SylvanBrocard/dpu_trees/actions?query=workflow%3AConda
@@ -20,22 +18,23 @@ A project built with [pybind11](https://github.com/pybind/pybind11) and scikit-b
 Installation
 ------------
 
+- install the [UPMEM SDK](https://sdk.upmem.com/)
 - `pip install dpu-trees`
 
-OR
+Usage
+-----
 
-- clone this repository
-- install the [UPMEM SDK](https://sdk.upmem.com/)
-- `pip install ./dpu_trees`
+TODO
 
 Development
 -----------
 
 - clone this repository
 - install the [UPMEM SDK](https://sdk.upmem.com/)
+- install the build requirements in [`pyproject.toml`](pyproject.toml)
 - `cd dpu_trees`
 - `pre-commit install`
-- `python3 setup.py develop`
+- `pip install -e .`
 - `python setup.py clean`
 
 OR
@@ -43,6 +42,29 @@ OR
 - clone this repository
 - open folder in VS Code
 - start in Dev Container
+
+to debug: `python setup.py develop --build-type Debug`
+
+*Note:* The dev container is for development only and uses the PIM simulator.
+
+Templating
+----------
+
+To use this project as a base for your own UPMEM DIMM project:
+
+- click on "Use this template" in github
+- create a new project from this one
+- turn off Conda and Wheels workflows in github actions as they are not operational right now
+- change folder `src/dpu_trees` to `src/<your_project>`
+- change project name (all instances of `dpu_trees`) and info in:
+  - README.md
+  - setup.cfg
+  - setup.py (`cmake_install_dir="src/dpu_trees"`)
+  - .gitignore (`src/dpu_trees/dpu_program/`)
+  - CMakeLists.txt (`project(dpu_trees VERSION ${VERSION})`)
+  - conda.recipe/meta.yaml (optional)
+  - docs (optional)
+- if you intend to use github actions to auto-publish to pypi, update the project secrets as described in [Publishing package distribution releases using GitHub Actions CI/CD workflows](https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/)
 
 Testing
 -------
@@ -60,14 +82,16 @@ OR
 - start in Dev Container
 - `nox`
 
-*Note:* `nox` and `pip` will fail if you executed `setup.py install` or `setup.py develop`, delete the cache by running `python setup.py clean` to solve.
+*Note:* `nox`, `python setup.py` and `pip` might fail if you executed `pip install -e .` previously, delete the `_skbuild` cache or run `python setup.py clean` to solve.
 
 Test call
 ---------
 
 ```python
 import dpu_trees
-dpu_trees.add(1, 2)
+dpu_trees.test_checksum()
 ```
+
+Expected return: `0x007f8000`
 
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io

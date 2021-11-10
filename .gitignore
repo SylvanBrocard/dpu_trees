@@ -147,3 +147,6 @@ _skbuild/
 
 # built dpu binaries
 src/dpu_trees/dpu_program/
+
+# clang config file
+.clangd
