@@ -1,13 +1,20 @@
+#include <pybind11/cast.h>
+#include <pybind11/detail/common.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/pytypes.h>
 #include <iostream>
+
 
 extern "C"
 {
 #include <dpu.h>
 #include "trees.h"
+#include "common.h"
 }
+
+using namespace pybind11::literals; /* necessary for the '_a' keyword in py::dict definition */
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -21,6 +28,27 @@ extern "C" int checksum(char *);
 
 namespace py = pybind11;
 
+py::object random_splitter_class = py::module::import("sklearn.tree._splitter").attr("RandomSplitter");
+py::object parent_metaclass = py::reinterpret_borrow<py::object>((PyObject *) &PyType_Type);
+py::dict attributes = py::dict(
+    "test"_a = py::cpp_function(
+        [](py::object self, py::object x) {
+            py::print(x);
+        },
+        py::is_method(py::none())
+    ),
+    "node_reset"_a = py::cpp_function(
+        [](py::object self, size_t start, size_t end, double* weighted_n_node_samples) {
+        },
+        py::is_method(py::none())
+    ),
+    "node_split"_a = py::cpp_function(
+        [](py::object self, double impurity, py::object* split, size_t* n_constant_features) {
+        },
+        py::is_method(py::none())
+    )
+);
+
 /**
  * @brief Container class for interfacing with python
  *
@@ -31,8 +59,7 @@ class Container
 {
 private:
     Params p;
-    float **features_float;
-    int_feature **features_int;
+    feature_t **features_float;
     int *targets;
 
 public:
@@ -117,8 +144,6 @@ public:
         // else if (restore_features)
         //     postprocessing(&p, features_float);
         free(features_float);
-        free(features_int[0]);
-        free(features_int);
         // free(p.mean);
         #ifdef FLT_REDUCE
         deallocateMembershipTable();
@@ -137,37 +162,36 @@ public:
     * @brief Main function for the KMeans algorithm.
     *
     * @return py::array_t<float> The centroids coordinates found by the algorithm.
-    */
-    py::array_t<float> trees_cpp(
-        int isOutput,                    /**< whether or not to print the centroids */
-        int nloops,                      /**< how many times the algorithm will be executed for each number of clusters */
-        int max_iter,                    /**< upper bound of the number of iterations */
-        py::array_t<int> log_iterations, /**< array logging the iterations per nclusters */
-        py::array_t<double> log_time)    /**< array logging the time taken per nclusters */
-    {
-        int *log_iter_ptr = (int *)log_iterations.request().ptr;
-        double *log_time_ptr = (double *)log_time.request().ptr;
+    // */
+    // py::array_t<float> trees_cpp(
+    //     int isOutput,                    /**< whether or not to print the centroids */
+    //     int nloops,                      /**< how many times the algorithm will be executed for each number of clusters */
+    //     int max_iter,                    /**< upper bound of the number of iterations */
+    //     py::array_t<int> log_iterations, /**< array logging the iterations per nclusters */
+    //     py::array_t<double> log_time)    /**< array logging the time taken per nclusters */
+    // {
+    //     int *log_iter_ptr = (int *)log_iterations.request().ptr;
+    //     double *log_time_ptr = (double *)log_time.request().ptr;
 
-        float *clusters = kmeans_c(
-            &p,
-            features_float,
-            features_int,
-            log_iter_ptr,
-            log_time_ptr,
-            &best_nclusters);
+    //     float *clusters = kmeans_c(
+    //         &p,
+    //         features_float,
+    //         features_int,
+    //         log_iter_ptr,
+    //         log_time_ptr);
 
-        std::vector<ssize_t> shape = {best_nclusters, p.nfeatures};
-        std::vector<ssize_t> strides = {(int)sizeof(float) * p.nfeatures, sizeof(float)};
+    //     std::vector<ssize_t> shape = {best_nclusters, p.nfeatures};
+    //     std::vector<ssize_t> strides = {(int)sizeof(float) * p.nfeatures, sizeof(float)};
 
-        py::capsule free_when_done(clusters, [](void *f)
-                                { delete reinterpret_cast<float *>(f); });
+    //     py::capsule free_when_done(clusters, [](void *f)
+    //                             { delete reinterpret_cast<float *>(f); });
 
-        return py::array_t<float>(
-            shape,
-            strides,
-            clusters,
-            free_when_done);
-    }
+    //     return py::array_t<float>(
+    //         shape,
+    //         strides,
+    //         clusters,
+    //         free_when_done);
+    // }
 };
 
 PYBIND11_MODULE(_core, m)
@@ -197,8 +221,8 @@ PYBIND11_MODULE(_core, m)
         .def("load_kernel", &Container::load_kernel)
         .def("load_array_data", &Container::load_array_data)
         .def("free_data", &Container::free_data)
-        .def("free_dpus", &Container::free_dpus)
-        .def("kmeans", &Container::kmeans_cpp);
+        .def("free_dpus", &Container::free_dpus);
+        // .def("kmeans", &Container::trees_cpp);
 
     m.def("add", &add, R"pbdoc(
         Add two numbers
@@ -218,6 +242,8 @@ PYBIND11_MODULE(_core, m)
     m.def("checksum", &checksum, R"pbdoc(
         Checksum test on dpus
     )pbdoc");
+
+    m.attr("RandomDPUSplitter") = parent_metaclass("RandomDPUSplitter", py::make_tuple(random_splitter_class), attributes);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

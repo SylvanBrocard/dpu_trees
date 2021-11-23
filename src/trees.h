@@ -12,18 +12,7 @@
 #include <math.h>
 #include <dpu.h>
 typedef struct dpu_set_t dpu_set;
-#endif
 
-// Define the size of discretized features (choose one):
-
-// typedef int8_t int_feature;
-////////// OR
-typedef int16_t int_feature;
-////////// OR
-// typedef int32_t int_feature;
-// #define FEATURETYPE_32
-
-#ifndef _KMEANS_DPU_KERNEL_H_
 // Parameters holding struct
 typedef struct Params {
     uint64_t npoints;

@@ -9,6 +9,7 @@
 #include <dpu_log.h>
 
 #include "../trees.h"
+#include "../common.h"
 
  /**
  * @brief Allocates all DPUs
@@ -46,7 +47,7 @@ void load_kernel(Params *p, const char *DPU_BINARY)
  * @brief Fills the DPUs with their assigned points.
  */
 void populateDpu(Params *p,       /**< Algorithm parameters */
-                 float **features) /**< [in] array: [npoints][nfeatures] */
+                 feature_t **features) /**< [in] array: [npoints][nfeatures] */
 {
     /* Iteration variables for the DPUs. */
     struct dpu_set_t dpu;
@@ -61,7 +62,7 @@ void populateDpu(Params *p,       /**< Algorithm parameters */
         next = each_dpu * p->npointperdpu;
         DPU_ASSERT(dpu_prepare_xfer(dpu, features[next]));
     }
-    DPU_ASSERT(dpu_push_xfer(p->allset, DPU_XFER_TO_DPU, "t_features", 0, p->npointperdpu * p->nfeatures * sizeof(int_feature), DPU_XFER_DEFAULT));
+    DPU_ASSERT(dpu_push_xfer(p->allset, DPU_XFER_TO_DPU, "t_features", 0, p->npointperdpu * p->nfeatures * sizeof(feature_t), DPU_XFER_DEFAULT));
 
     /* telling each DPU how many real points it has to process */
     nreal_points = (int *)malloc(p->ndpu * sizeof(*nreal_points));

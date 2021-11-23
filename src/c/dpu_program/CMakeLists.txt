@@ -23,10 +23,10 @@ set(CMAKE_C_FLAGS_DEBUG "-g -Og")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -flto=thin")
 
 add_executable(trivial_checksum_example trivial_checksum_example.c)
-add_executable(kmeans_dpu_kernel kmeans_dpu_kernel.c)
+add_executable(trees_dpu_kernel trees_dpu_kernel.c)
 
-target_compile_definitions(kmeans_dpu_kernel PUBLIC NR_TASKLETS=${NR_TASKLETS})
-target_link_options(kmeans_dpu_kernel PUBLIC -DNR_TASKLETS=${NR_TASKLETS})
+target_compile_definitions(trees_dpu_kernel PUBLIC NR_TASKLETS=${NR_TASKLETS})
+target_link_options(trees_dpu_kernel PUBLIC -DNR_TASKLETS=${NR_TASKLETS})
 
 install(TARGETS trivial_checksum_example DESTINATION .)
-install(TARGETS kmeans_dpu_kernel DESTINATION .)
+install(TARGETS trees_dpu_kernel DESTINATION .)

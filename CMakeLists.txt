@@ -56,15 +56,12 @@ pybind11_add_module(
   _core
   MODULE
   src/main.cpp
-  src/trees.h
   src/host_program/trivial_checksum_example_host.c
-  src/host_program/kmeans.c
-  src/host_program/cluster.c
-  src/host_program/kmeans_clustering.c
-  src/host_program/kmeans_dpu.c
-  src/host_program/rmse.c
-  src/host_program/tree_structure.c
-  src/host_program/dpu_management.c)
+  src/host_program/dpu_management.c
+  src/host_program/input.c
+  src/host_program/preprocessing.c
+  src/host_program/splitter.c
+  src/host_program/tree_structure.c)
 target_link_libraries(_core PRIVATE PkgConfig::DPU OpenMP::OpenMP_CXX
                                     OpenMP::OpenMP_C)
 target_include_directories(_core PRIVATE PkgConfig::DPU)

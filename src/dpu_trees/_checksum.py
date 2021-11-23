@@ -10,6 +10,6 @@ from ._core import checksum
 
 
 def test_checksum():
-    ref = files("dpu_kmeans").joinpath("dpu_program/trivial_checksum_example")
+    ref = files("dpu_trees").joinpath("dpu_program/trivial_checksum_example")
     with as_file(ref) as path:
         return f"{checksum(str(path)):#0{10}x}"
