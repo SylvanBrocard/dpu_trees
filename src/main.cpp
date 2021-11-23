@@ -11,7 +11,7 @@ extern "C"
 {
 #include <dpu.h>
 #include "trees.h"
-#include "common.h"
+#include "trees_common.h"
 }
 
 using namespace pybind11::literals; /* necessary for the '_a' keyword in py::dict definition */

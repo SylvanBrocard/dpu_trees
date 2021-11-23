@@ -17,7 +17,7 @@ include(ExternalProject)
 
 ExternalProject_Add(
   dpu_program
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/dpu_program
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/c/dpu_program
   INSTALL_DIR ./dpu_program
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
              -DNR_TASKLETS=${NR_TASKLETS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -56,12 +56,12 @@ pybind11_add_module(
   _core
   MODULE
   src/main.cpp
-  src/host_program/trivial_checksum_example_host.c
-  src/host_program/dpu_management.c
-  src/host_program/input.c
-  src/host_program/preprocessing.c
-  src/host_program/splitter.c
-  src/host_program/tree_structure.c)
+  src/c/trivial_checksum_example_host.c
+  src/c/dpu_management.c
+  src/c/input.c
+  src/c/preprocessing.c
+  src/c/splitter.c
+  src/c/tree_structure.c)
 target_link_libraries(_core PRIVATE PkgConfig::DPU OpenMP::OpenMP_CXX
                                     OpenMP::OpenMP_C)
 target_include_directories(_core PRIVATE PkgConfig::DPU)

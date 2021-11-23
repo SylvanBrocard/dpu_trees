@@ -9,7 +9,7 @@
 #include <dpu_log.h>
 
 #include "../trees.h"
-#include "../common.h"
+#include "../trees_common.h"
 
  /**
  * @brief Allocates all DPUs

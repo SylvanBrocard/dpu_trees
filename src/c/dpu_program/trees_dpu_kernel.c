@@ -10,19 +10,18 @@
                               */
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <mram.h>
 
-#include "../../common.h"
+#include "../../trees_common.h"
 
 /*------------------ TYPES ------------------------------*/
 /**
- * @brief Record of a split
- *
+ * @brief Data to track sample split
  */
 typedef struct StackRecord {
     size_t start;
@@ -34,7 +33,6 @@ typedef struct StackRecord {
 
 /**
  * @brief LIFO data structure
- *
  */
 typedef struct Stack {
     int top;
@@ -42,26 +40,82 @@ typedef struct Stack {
     StackRecord stack[MAX_STACK_DPU];
 } Stack;
 
+/**
+ * @brief Criterion data
+ *
+ * The criterion computes the impurity of a node and the reduction of
+ * impurity of a split on that node. It also computes the output statistics
+ * such as the mean in regression and class probabilities in classification.
+ */
+typedef struct Criterion {
+    size_t *y; /**< Values of y */
+
+    size_t *samples; /**< Sample indices in X, y */
+    size_t start;    /**< samples[start:pos] are the samples in the left node */
+    size_t pos;      /**< samples[pos:end] are the samples in the right node */
+    size_t end;
+
+    size_t n_left;  /**< number of samples in the left */
+    size_t n_right; /**< number of samples in the right node */
+
+    size_t *sum_total; /**< For classification criteria, the sum of the weighted
+                            count of each label. For regression, the sum of w*y.
+                            sum_total[k] is equal to sum_{i=start}^{end-1}
+                            w[samples[i]]*y[samples[i], k], where k is output
+                            index. */
+    size_t *sum_left;  /**< Same as above, but for the left side of the split */
+    size_t
+        *sum_right; /**< same as above, but for the right side of the split */
+} Criterion;
+
+/*================== VARIABLES ==========================*/
+/*------------------ LOCAL ------------------------------*/
+/** @name Globals
+ * Global variables shared between tasklets
+ */
+/**@{*/
+Criterion criterion; /**< data about the current leaf */
+/**@}*/
+
+/*------------------ INPUT ------------------------------*/
+/** @name Host
+ * Variables for host application communication
+ */
+/**@{*/
+__host size_t nfeatures;
+__host size_t n_classes;
+/**@}*/
+
+/*================== TABLES =============================*/
+/*------------------ LOCAL ------------------------------*/
+/** @name Globals
+ * Global tables shared between tasklets
+ */
+/**@{*/
+Stack stack;                   /**< Stack of split records. */
+size_t sum_total[MAX_CLASSES]; /**< sum of class observations for the current
+                                  node */
+size_t sum_left[MAX_CLASSES];  /**< sum of class observations for the current
+                                  left child */
+size_t sum_right[MAX_CLASSES]; /**< sum of class observations for the current
+                                  right child */
+__mram_noinit feature_t
+    feature_values[MAX_SAMPLES_DPU]; /** Vector of one type of features. */
+/**@}*/
+
 /*------------------ INPUT ------------------------------*/
 /** @name Input
  * Input arrays
  */
 /**@{*/
-__mram_noinit feature_t t_features[MAX_FEATURE_DPU];
-/**@}*/
-
-/*------------------ INTERNAL ------------------------------*/
-/** @name Internal
- * Internal global variables
- */
-/**@{*/
-Stack stack;
+__mram_noinit feature_t t_features[MAX_FEATURE_DPU]; /**< Vector of features. */
+__mram_noinit size_t t_targets[MAX_SAMPLES_DPU];     /**< Vector of targets. */
 /**@}*/
 
 /**
  * @brief Initialize the Stack structure
  *
- * @param self pointer to the stack structure
+ * @param self [in, out] pointer to the stack structure
  */
 void init_stack(Stack *self) {
     self->capacity = MAX_STACK_DPU;
@@ -71,7 +125,7 @@ void init_stack(Stack *self) {
 /**
  * @brief Returns whether a Stack object is empty
  *
- * @param self Pointer to the Stack object
+ * @param self [in] pointer to the Stack object
  * @return true Object is empty
  * @return false Object is not empty
  */
@@ -80,13 +134,13 @@ bool is_empty(Stack *self) { return self->top <= 0; }
 /**
  * @brief Push a new element onto the stack.
  *
- * @param self Pointer to the Stack object.
- * @param start
- * @param end
- * @param depth
- * @param parent
- * @param is_left
- * @return int -1 in case of failure to allocate memory or 0 otherwise.
+ * @param self [in,out] Pointer to the Stack object.
+ * @param start [in]
+ * @param end [in]
+ * @param depth [in]
+ * @param parent [in]
+ * @param is_left [in]
+ * @return int -1 in case of insufficient memory or 0 otherwise.
  */
 int push(Stack *self, size_t start, size_t end, size_t depth, size_t parent,
          bool is_left) {
@@ -114,8 +168,8 @@ int push(Stack *self, size_t start, size_t end, size_t depth, size_t parent,
 /**
  * @brief Remove the top element from the stack and copy to ``res``.
  *
- * @param self Pointer to the stack
- * @param res Pointer to the residual stack
+ * @param self [in] Pointer to the stack
+ * @param res [out] Pointer to the popped element
  * @return int 0 if pop was successful (and ``res`` is set); -1 otherwise.
  */
 int pop(Stack *self, StackRecord *res) {
@@ -131,14 +185,137 @@ int pop(Stack *self, StackRecord *res) {
     return 0;
 }
 
+/**
+ * @brief Finds the min and max of a feature, and fills `current_feature` with
+ * the values of that feature.
+ *
+ * @param start [in] index of the first element
+ * @param end [in] index of the last element
+ * @param samples [in] array of sample indices
+ * @param Xf [in] array of sample feature
+ * @param min [out] minimum found
+ * @param max [out] maximum found
+ * @param current_feature [in] index of the feature under consideration
+ */
+void find_min_max(size_t start, size_t end, size_t *samples, feature_t *Xf,
+                  feature_t *min, feature_t *max, size_t current_feature) {
+    feature_t min_feature_value =
+        t_features[samples[start] * nfeatures + current_feature];
+    feature_t max_feature_value = min_feature_value;
+    Xf[start] = min_feature_value;
+
+    for (size_t p = start + 1; p < end; p++) {
+        feature_t current_feature_value =
+            t_features[samples[p] * nfeatures + current_feature];
+        Xf[p] = current_feature_value;
+
+        if (current_feature_value < min_feature_value)
+            min_feature_value = current_feature_value;
+        else if (current_feature_value > max_feature_value)
+            max_feature_value = current_feature_value;
+    }
+}
+
+/**
+ * @brief Threshold-based partitions of a list of samples based on one feature
+ *
+ * @param start [in] index of the first element
+ * @param end [in] index of the last element
+ * @param threshold [in] threshold for partitioning
+ * @param samples [in, out] array of sample indices
+ * @param Xf [in, out] array of sample feature
+ * @return size_t index of the first element greater than `threshold`
+ */
+size_t partition(size_t start, size_t end, feature_t threshold, size_t *samples,
+                 feature_t *Xf) {
+    size_t p = start, partition_end = end;
+    size_t swap_index;
+    feature_t swap_feature;
+
+    while (p < partition_end) {
+        if (Xf[p] <= threshold) {
+            p++;
+        } else {
+            partition_end--;
+
+            swap_feature = Xf[p];
+            Xf[p] = Xf[partition_end];
+            Xf[partition_end] = swap_feature;
+
+            swap_index = samples[p];
+            samples[p] = samples[partition_end];
+            samples[partition_end] = swap_index;
+        }
+    }
+
+    return partition_end;
+}
+
+/**
+ * @brief Resets the criterion at pos=start.
+ *
+ * @param self [in, out] pointer to the criterion
+ */
+void criterion_reset(Criterion *self) {
+    self->pos = self->start;
+
+    memset(self->sum_left, 0, n_classes * sizeof(*self->sum_left));
+    memcpy(self->sum_right, self->sum_total, n_classes * sizeof(*self->sum_right));
+}
+
+/**
+ * @brief Resets the criterion at pos=end.
+ *
+ * @param self [in, out] pointer to the criterion
+ */
+void criterion_reverse_reset(Criterion *self) {
+    memset(self->sum_left, 0, n_classes * sizeof(*self->sum_left));
+    memcpy(self->sum_right, sum_total, n_classes * sizeof(*self->sum_right));
+}
+
+/**
+ * @brief Updated statistics by moving samples[pos:new_pos] to the left child.
+ *
+ * Given that
+ *  sum_left[x] +  sum_right[x] = sum_total[x]
+ * and that sum_total is known, we are going to update sum_left from the
+ * direction that require the least amount of computations, i.e. from pos to
+ * new_pos or from end to new_pos.
+ *
+ * @param self [in, out] pointer to the criterion
+ * @param new_pos [in] The new ending position for which to move samples from
+ * the right child to the left child.
+ */
+void criterion_update(Criterion *self, size_t new_pos) {
+    size_t pos = self->pos;
+    size_t end = self->end;
+    size_t *samples = self->samples;
+
+    size_t *sum_left = self->sum_left;
+    size_t *sum_right = self->sum_right;
+    size_t *sum_total = self->sum_total;
+
+    if ((new_pos - pos) <= (end - new_pos)) {
+        for (size_t p = pos; p < new_pos; p++) {
+            size_t i = samples[p];
+
+            size_t label_index = self->y[i];
+            sum_left[label_index]++;
+
+            self->n_left++;
+        }
+    }
+}
+
 /*================== MAIN FUNCTION ======================*/
 /**
  * @brief Main function DPU side.
  *
  * @return int 0 on success.
  */
-int main()
-{
+int main() {
+    printf("%u", sizeof(size_t));
+
     return 0;
 }
 
