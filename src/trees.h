@@ -8,8 +8,8 @@
 #ifndef _H_TREES
 #define _H_TREES /**< header guard */
 
-#include <math.h>
 #include <dpu.h>
+#include <math.h>
 typedef struct dpu_set_t dpu_set;
 
 // Parameters holding struct
@@ -31,6 +31,21 @@ typedef struct Params {
     float *features_mins;
     float *features_maxes;
 } Params;
+
+/**
+ * @brief Data to track sample split
+ *
+ */
+typedef struct SplitRecord {
+    size_t feature; /**< Which feature to split on. */
+    size_t pos; /**< Split samples array at the given position, i.e. count of
+                   samples below threshold for feature. pos is >= end if the
+                   node is a leaf. */
+    double threshold;      /**< Threshold to split at. */
+    double improvement;    /**< Impurity improvement given parent node. */
+    double impurity_left;  /**< Impurity of the left split. */
+    double impurity_right; /**< Impurity of the right split. */
+} SplitRecord;
 
 // /**
 //  * @brief Node structure.
@@ -58,7 +73,8 @@ typedef struct Params {
 //     size_t n_outputs;     /**< Number of outputs in y */
 //     size_t max_n_classes; /**< max(n_classes) */
 
-//     /* Inner structures: values are stored separately from node structure, since
+//     /* Inner structures: values are stored separately from node structure,
+//     since
 //      * size is determined at runtime. */
 //     size_t max_depth;    /**< Max depth of the tree */
 //     size_t node_count;   /**< Counter for node IDs */

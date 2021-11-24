@@ -55,17 +55,23 @@ typedef struct Criterion {
     size_t pos;      /**< samples[pos:end] are the samples in the right node */
     size_t end;
 
-    size_t n_left;  /**< number of samples in the left */
-    size_t n_right; /**< number of samples in the right node */
+    size_t n_samples;      /**< Number of samples */
+    size_t n_node_samples; /**< Number of samples in the node (end-start) */
+    size_t n_left;         /**< number of samples in the left node */
+    size_t n_right;        /**< number of samples in the right node */
 
     size_t *sum_total; /**< For classification criteria, the sum of the weighted
                             count of each label. For regression, the sum of w*y.
                             sum_total[k] is equal to sum_{i=start}^{end-1}
                             w[samples[i]]*y[samples[i], k], where k is output
                             index. */
-    size_t *sum_left;  /**< Same as above, but for the left side of the split */
-    size_t
-        *sum_right; /**< same as above, but for the right side of the split */
+    size_t *sum_left;  /**< Same as above, but for the left side
+                            of the split */
+    size_t *sum_right; /**< same as above, but for the right side
+                            of the split */
+
+    /* Parameters specific to classification criteria */
+    size_t n_classes;
 } Criterion;
 
 /*================== VARIABLES ==========================*/
@@ -259,8 +265,17 @@ size_t partition(size_t start, size_t end, feature_t threshold, size_t *samples,
 void criterion_reset(Criterion *self) {
     self->pos = self->start;
 
-    memset(self->sum_left, 0, n_classes * sizeof(*self->sum_left));
-    memcpy(self->sum_right, self->sum_total, n_classes * sizeof(*self->sum_right));
+    self->n_left = 0;
+    self->n_right = self->n_node_samples;
+
+    size_t *sum_total = self->sum_total;
+    size_t *sum_left = self->sum_left;
+    size_t *sum_right = self->sum_right;
+
+    size_t n_classes = self->n_classes;
+
+    memset(sum_left, 0, n_classes * sizeof(*sum_left));
+    memcpy(sum_right, sum_total, n_classes * sizeof(*sum_right));
 }
 
 /**
@@ -269,8 +284,19 @@ void criterion_reset(Criterion *self) {
  * @param self [in, out] pointer to the criterion
  */
 void criterion_reverse_reset(Criterion *self) {
-    memset(self->sum_left, 0, n_classes * sizeof(*self->sum_left));
-    memcpy(self->sum_right, sum_total, n_classes * sizeof(*self->sum_right));
+    self->pos = self->end;
+
+    self->n_left = self->n_node_samples;
+    self->n_right = 0;
+
+    size_t *sum_total = self->sum_total;
+    size_t *sum_left = self->sum_left;
+    size_t *sum_right = self->sum_right;
+
+    size_t n_classes = self->n_classes;
+
+    memset(sum_right, 0, n_classes * sizeof(*sum_right));
+    memcpy(sum_left, sum_total, n_classes * sizeof(*sum_left));
 }
 
 /**
@@ -289,11 +315,13 @@ void criterion_reverse_reset(Criterion *self) {
 void criterion_update(Criterion *self, size_t new_pos) {
     size_t pos = self->pos;
     size_t end = self->end;
-    size_t *samples = self->samples;
 
     size_t *sum_left = self->sum_left;
     size_t *sum_right = self->sum_right;
     size_t *sum_total = self->sum_total;
+
+    size_t n_classes = self->n_classes;
+    size_t *samples = self->samples;
 
     if ((new_pos - pos) <= (end - new_pos)) {
         for (size_t p = pos; p < new_pos; p++) {
@@ -305,6 +333,26 @@ void criterion_update(Criterion *self, size_t new_pos) {
             self->n_left++;
         }
     }
+    else {
+        criterion_reverse_reset(self);
+
+        for(size_t p = end-1; p > new_pos - 1; p--) {
+            size_t i = samples[p];
+
+            size_t label_index = self->y[i];
+            sum_left[label_index]--;
+
+            self->n_left--;
+        }
+    }
+
+    /* Update right part statistics */
+    self->n_right = self->n_node_samples - self->n_left;
+    for(size_t c = 0; c < n_classes; c++) {
+        sum_right[c] = sum_total[c] - sum_left[c];
+    }
+
+    self->pos = new_pos;
 }
 
 /*================== MAIN FUNCTION ======================*/
